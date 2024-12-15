@@ -22,9 +22,6 @@
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/main.css?v=5.3 ') }}" />
     <style>
         .invoice-3 .invoice-header {
-            /* background: url(../imgs/invoice/header-bg-2.jpg) top left no-repeat; */
-            /* background-size: cover; */
-            /* color: #fff; */
             padding: 30px;
         }
         .invoice .invoice-top {
@@ -61,30 +58,29 @@
                                                 </a>
                                                 <div>
                                                     <strong>{{ get_setting('business_name')->value ?? ''}}</strong> <br />
-                                                    {{-- {{ get_setting('business_address')->value ?? ''}}<br> --}}
                                                     <abbr title="Phone">Phone:</abbr> {{ get_setting('phone')->value ?? ''}}<br>
                                                     <abbr title="Email">Email: </abbr>{{ get_setting('email')->value ?? ''}}<br>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                            
+
                                     <div class="col-sm-4">
                                         <div class="invoice-numb">
                                             <h4 class="invoice-header-1 mb-10 mt-20">Invoice No:<span class="text-heading">{{ $order->invoice_no }}</span></h4>
                                             <strong class="text-mute">Invoice Data:</strong> {{ \Carbon\Carbon::parse($order->date)->isoFormat('MMM Do YYYY')}}<br />
-                                            <strong class="text-mute">Payment Method:</strong> 
-                                            @if($order->payment_method == 'cod') 
-                                                Cash On Delivery 
-                                            @elseif($order->payment_method == 'bmp') 
+                                            <strong class="text-mute">Payment Method:</strong>
+                                            @if($order->payment_method == 'cod')
+                                                Cash On Delivery
+                                            @elseif($order->payment_method == 'bmp')
                                                 Bkash Manual Payment
-                                            @else {{ $order->payment_method }} 
+                                            @else {{ $order->payment_method }}
                                             @endif
                                             <br />
                                             <strong class="text-mute">Status:</strong> <span class="">{{ $order->delivery_status }}</span>
                                         </div>
                                     </div>
-                                   
+
                                 </div>
                             </div>
                             <div class="invoice-top">
@@ -93,26 +89,36 @@
                                         <div class="invoice-number">
                                             <h4 class="invoice-title-1 mb-10">Bill To</h4>
                                             <p class="invoice-addr-1 text-capitalize">
-                                                {{-- @if($order->user->name)
-                                                    <strong>{{ $order->user->name ?? '' }}</strong> <br />
-                                                @else
-                                                    <strong>{{ $order->name ?? '' }}</strong> <br />
-                                                @endif --}}
                                                 <strong>{{ $order->name ?? '' }}</strong> <br />
-                                                {{ $order->address ?? '' }}<br>
-                                                {{ $order->upazilla->name_en ?? '' }}, {{ $order->district->district_name_en ?? '' }}, {{ $order->division->division_name_en ?? '' }}<br>
-                                                {{-- @if($order->user->phone)
-                                                    <abbr title="Phone">Phone:</abbr> {{ $order->user->phone ?? ''}}<br>
-                                                @else
-                                                    <abbr title="Phone">Phone:</abbr> {{ $order->phone ?? ''}}<br>
-                                                @endif --}}
+                                                @php
+                                                    if ($order->address) {
+                                                        $pathao = new App\Http\Controllers\Frontend\PathaoController();
+                                                        $cityResult = $pathao->getCities();
+                                                        $cities = $cityResult->data->data;
+                                                        $city = null;
+                                                        foreach ($cities as $key => $cityItem) {
+                                                            if ($cityItem->city_id == $order->division_id) {
+                                                                $city = $cityItem;
+                                                                break;
+                                                            }
+                                                        }
+                                                        $pathao = new App\Http\Controllers\Frontend\PathaoController();
+                                                        $zoneResult = $pathao->getZones($order->division_id);
+                                                        $zones = $zoneResult->data->data;
+                                                        $zone = null;
+                                                        foreach ($zones as $key => $zoneItem) {
+                                                            if ($zoneItem->zone_id == $order->district_id) {
+                                                                $zone = $zoneItem;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                @endphp
+                                                Address : {{ isset($order->address) ? $order->address . ',' : 'No address' }}
+                                                    {{ isset($zone) && isset($zone->zone_name) ? ucwords($zone->zone_name) . ',' : '' }}
+                                                    {{ isset($city) && isset($city->city_name) ? ucwords($city->city_name) : '' }}
+                                                <br>
                                                 <abbr title="Phone">Phone:</abbr> {{ $order->phone ?? ''}}<br>
-
-                                                {{-- @if($order->user->email)
-                                                    <abbr title="Email">Email: </abbr>{{ $order->user->email ?? ''}}<br>
-                                                @else
-                                                    <abbr title="Email">Email: </abbr>{{ $order->email ?? ''}}<br>
-                                                @endif --}}
                                                 <abbr title="Email">Email: </abbr>{{ $order->email ?? ''}}<br>
                                             </p>
                                         </div>
@@ -176,19 +182,10 @@
                             <div class="invoice-bottom mb-5">
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        {{-- <div>
-                                            <h3 class="invoice-title-1">Important Note</h3>
-                                            <ul class="important-notes-list-1">
-                                                <li>All amounts shown on this invoice are in BDT</li>
-                                                <li>finance charge of 1.5% will be made on unpaid balances after 30 days.</li>
-                                                <li>Once order done, money can't refund</li>
-                                                <li>Delivery might delay due to some external dependency</li>
-                                            </ul>
-                                        </div> --}}
                                     </div>
                                     <div class="col-sm-6 col-offsite">
                                         <div class="text-end">
-                                            <p class="mb-0 text-13">Thank you for your order</p>
+                                            <p class="mb-0 text-13">Thank you for your Order</p>
                                             <p><strong>{{ get_setting('business_name')->value ?? ' '}}</strong></p>
                                         </div>
                                     </div>
@@ -196,7 +193,6 @@
                             </div>
                         </div>
                         <div class="invoice-btn-section clearfix d-print-none">
-                            <a href="javascript:window.print()" class="btn btn-lg btn-custom btn-print hover-up"> <img src="{{ asset('frontend/assets/imgs/theme/icons/icon-print.svg') }}" alt="" /> Print </a>
                             <a id="invoice_download_btn" class="btn btn-lg btn-custom btn-download hover-up"> <img src="{{ asset('frontend/assets/imgs/theme/icons/icon-download.svg') }}" alt="" /> Download </a>
                         </div>
                     </div>
@@ -211,5 +207,4 @@
     <script src="{{asset('frontend/assets/js/invoice/jspdf.min.js ') }}"></script>
     <script src="{{asset('frontend/assets/js/invoice/invoice.js ') }}"></script>
 </body>
-
 </html>

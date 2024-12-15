@@ -122,6 +122,8 @@ Route::get('/checkout/shipping/ajax/{shipping_cost}',[CheckoutController::class,
 /*================  Ajax  ==================*/
 Route::get('/division-district/ajax/{division_id}',[CheckoutController::class,'getdivision'])->name('division.ajax');
 Route::get('/district-upazilla/ajax/{district_id}',[CheckoutController::class,'getupazilla'])->name('upazilla.ajax');
+Route::get('/get-zones/ajax/{city_id}',[CheckoutController::class,'getZones'])->name('zone.ajax');
+Route::get('/get-areas/ajax/{zone_id}',[CheckoutController::class,'getAreas'])->name('area.ajax');
 /*================  Ajax  ==================*/
 
 /* ============  All Product Show   ============= */

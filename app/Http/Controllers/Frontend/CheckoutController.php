@@ -43,9 +43,11 @@ class CheckoutController extends Controller
         $carts = Cart::content();
         $cartTotal = Cart::total();
 
-        // dd($cartTotal);
+        $pathao = new PathaoController;
+        $cityResult = $pathao->getCities();
+        $cities = $cityResult->data->data;
 
-        return view('frontend.checkout.index',compact('addresses','shippings', 'carts', 'cartTotal'));
+        return view('frontend.checkout.index',compact('addresses','shippings', 'carts', 'cartTotal', 'cities'));
     } // end method
 
     public function shippingAjax($shipping_id){
@@ -70,7 +72,7 @@ class CheckoutController extends Controller
 
     /* ============= Start getdivision Method ============== */
     public function getdivision($division_id){
-    $division = District::where('division_id', $division_id)->orderBy('district_name_en','ASC')->get();
+        $division = District::where('division_id', $division_id)->orderBy('district_name_en','ASC')->get();
 
         return json_encode($division);
     }
@@ -84,6 +86,23 @@ class CheckoutController extends Controller
     }
     /* ============= End getupazilla Method ============== */
 
+
+    public function getZones($city_id){
+        $pathao = new PathaoController;
+        $zoneResult = $pathao->getZones($city_id);
+        $zones = $zoneResult->data->data;
+
+        return json_encode($zones);
+    }
+
+
+    public function getAreas($zone_id){
+        $pathao = new PathaoController;
+        $areaResult = $pathao->getAreas($zone_id);
+        $areas = $areaResult->data->data;
+
+        return json_encode($areas);
+    }
 
 
     /**
@@ -149,6 +168,7 @@ class CheckoutController extends Controller
                 $invoice_no = Session::get('invoice_no');
             }
         }
+
         // order add //
         $order = Order::create([
             'user_id' => $user_id,
@@ -162,7 +182,7 @@ class CheckoutController extends Controller
             'payment_status' => $payment_status,
             'invoice_no' => $invoice_no,
             'delivery_status' => 'pending',
-            'note_status' => 'Pending',
+            'note_status' => 'pending',
             'phone' => $request->phone,
             'email' => $request->email,
             'division_id' => $request->division_id,
@@ -171,6 +191,7 @@ class CheckoutController extends Controller
             'address' => $request->address,
             'comment' => $request->comment,
             'type' => $type,
+            'sale_type'   => 2,
         ]);
 
         if(get_setting('otp_system')){
@@ -284,6 +305,14 @@ class CheckoutController extends Controller
         $ledger->balance = get_account_balance() + $order->grand_total;
         $ledger->save();
 
+        $amount = 0;
+        foreach ($order->order_details as $order_detail) {
+            $product_purchase_price = $order_detail->product->purchase_price;
+            $amount += $order_detail->product->purchase_price;
+        }
+        $order->pur_sub_total = $amount;
+        $order->save();
+
         $notification = array(
             'message' => 'Your order has been placed successfully.',
             'alert-type' => 'success'
@@ -300,7 +329,6 @@ class CheckoutController extends Controller
     public function show($id)
     {
         $order = Order::where('invoice_no', $id)->first();
-
         $notification = array(
             'message' => 'Your Order Successfully.',
             'alert-type' => 'success'

@@ -17,6 +17,7 @@ use App\Models\Ordernote;
 use Session;
 use PDF;
 use Illuminate\Support\Carbon;
+use App\Http\Controllers\Frontend\PathaoController;
 
 class OrderController extends Controller
 {
@@ -55,10 +56,46 @@ class OrderController extends Controller
             }
         }
 
-        $orders = $orders->paginate(15);
+        $orders = $orders->where('sale_type', 2)->paginate(15);
         $ordernotes = Ordernote::where('status', 1)->get();
 
         return view('backend.sales.all_orders.index', compact('orders', 'delivery_status', 'payment_status', 'note_status', 'date_range', 'ordernotes'));
+    }
+
+
+    public function Posindex(Request $request)
+    {
+        $delivery_status = $request->input('delivery_status');
+        $payment_status = $request->input('payment_status');
+        $note_status = $request->input('note_status');
+        $date_range = $request->input('date_range');
+
+        $orders = Order::query();
+
+        if ($delivery_status) {
+            $orders->where('delivery_status', $delivery_status);
+        }
+        if ($payment_status) {
+            $orders->where('payment_status', $payment_status);
+        }
+        if ($note_status) {
+            $orders->where('note_status', $note_status);
+        }
+        if ($date_range) {
+            try {
+                $dates = explode(' - ', $date_range);
+                $start_date = \Carbon\Carbon::createFromFormat('Y-m-d h:i A', trim($dates[0]));
+                $end_date = \Carbon\Carbon::createFromFormat('Y-m-d h:i A', trim($dates[1]));
+                $orders->whereBetween('created_at', [$start_date, $end_date]);
+            } catch (\Exception $e) {
+                // Handle invalid date range
+            }
+        }
+
+        $orders = $orders->where('sale_type', 1)->paginate(15);
+        $ordernotes = Ordernote::where('status', 1)->get();
+
+        return view('backend.sales.all_orders.pos_sale_index', compact('orders', 'delivery_status', 'payment_status', 'note_status', 'date_range', 'ordernotes'));
     }
 
 
@@ -94,7 +131,23 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $shippings = Shipping::where('status', 1)->get();
         $ordernotes = Ordernote::where('status', 1)->get();
-        return view('backend.sales.all_orders.show', compact('order', 'shippings', 'ordernotes'));
+        $cities =0;
+        $pathao = new PathaoController;
+        $cityResult = $pathao->getCities();
+        $cities = $cityResult->data->data;
+        $zones = 0;
+        $areasshow = 0;
+        if ($order->division_id > 0) {
+            $pathao = new PathaoController;
+            $zoneResult = $pathao->getZones($order->division_id);
+            $zones = $zoneResult->data->data;
+        }
+        if ($order->district_id > 0) {
+            $pathao = new PathaoController;
+            $areaResult = $pathao->getAreas($order->district_id);
+            $areasshow = $areaResult->data->data;
+        }
+        return view('backend.sales.all_orders.show', compact('order', 'shippings', 'ordernotes', 'cities', 'zones', 'areasshow'));
     }
 
     /**
@@ -117,6 +170,7 @@ class OrderController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //dd('Order Update', $request);
         $this->validate($request,[
             'payment_method' => 'required',
         ]);
@@ -125,6 +179,7 @@ class OrderController extends Controller
         $order->division_id = $request->division_id;
         $order->district_id = $request->district_id;
         $order->upazilla_id = $request->upazilla_id;
+        $order->address = $request->address;
         $order->payment_method = $request->payment_method;
 
         $discount_total = ($order->sub_total - $request->discount);

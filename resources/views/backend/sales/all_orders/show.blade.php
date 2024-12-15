@@ -119,9 +119,44 @@
                         </span>
                         <div class="text">
                             <h6 class="mb-1">Deliver to</h6>
+                            @php
+                                $city = null;
+                                $zone = null;
+                                $pathao = new App\Http\Controllers\Frontend\PathaoController();
+                                $cityResult = $pathao->getCities();
+                                $cities = $cityResult->data->data;
+                                foreach ($cities as $key => $cityItem) {
+                                    if ($cityItem->city_id == $order->division_id) {
+                                        $city = $cityItem;
+                                        break;
+                                    }
+                                }
+
+                                $pathao = new App\Http\Controllers\Frontend\PathaoController();
+                                $zoneResult = $pathao->getZones($order->division_id);
+                                $zones = $zoneResult->data->data;
+                                foreach ($zones as $key => $zoneItem) {
+                                    if ($zoneItem->zone_id == $order->district_id) {
+                                        $zone = $zoneItem;
+                                        break;
+                                    }
+                                }
+
+                                $pathao = new App\Http\Controllers\Frontend\PathaoController();
+                                $areaResult = $pathao->getAreas($order->district_id);
+                                $areas = $areaResult->data->data;
+                                foreach ($areas as $key => $areaItem) {
+                                    if ($areaItem->area_id == $order->upazilla_id) {
+                                        $area = $areaItem;
+                                        break;
+                                    }
+                                }
+                            @endphp
                             <p class="mb-1">
-                                Address: {{ isset($order->address) ? ucwords($order->address . ',') : '' }}
-                                {{ isset($order->district->district_name_en) ? ucwords($order->district->district_name_en . ',') : '' }}
+                                Address: {{ isset($order->address) ? $order->address . ',' : 'No address' }}
+                                {{ isset($area) && isset($area->area_name) ? ucwords($area->area_name) . ',' : '' }}
+                                {{ isset($zone) && isset($zone->zone_name) ? ucwords($zone->zone_name) . ',' : '' }}
+                                {{ isset($city) && isset($city->city_name) ? ucwords($city->city_name) : '' }}
                             </p>
                         </div>
                     </article>
@@ -139,37 +174,73 @@
                                     <td><input type="" class="form-control" name="email" value="{{ $order->email ?? 'Null'}}"></td>
                                 </tr>
                                 <tr>
-                                    <th class="col-2">Shipping Address</th>
+                                    <th class="col-2"><span class="text-danger">*</span> Cities
                                     <td>
-                                        <label for="division_id" class="fw-bold text-black"><span class="text-danger">*</span> Division</label>
-                                        <select class="form-control select-active"  name="division_id" id="division_id" required>
-                                            <option value="">Select Division</option>
-
-                                            @foreach(get_divisions($order->division_id) as $division)
-                                              <option value="{{ $division->id }}" {{ $division->id == $order->division_id ? 'selected': '' }}>{{ ucwords($division->division_name_en) }}</option>
-                                            @endforeach
+                                        <select class="form-control select-active" name="division_id" id="division_id"required>
+                                            @if ($order->division_id > 0)
+                                                @foreach ($cities as $city)
+                                                    <option value="{{ $city->city_id }}"
+                                                        {{ $city->city_id == $order->division_id ? 'selected' : '' }}>
+                                                        {{ ucwords($city->city_name) }}
+                                                    </option>
+                                                @endforeach
+                                            @else
+                                                <option value="">Select Cities</option>
+                                                @foreach ($cities as $city)
+                                                    <option value="{{ $city->city_id }}">
+                                                        {{ ucwords($city->city_name) }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </td>
-                                    <td>
-                                        <label for="district_id" class="fw-bold text-black"><span class="text-danger">*</span> District</label>
-                                        <select class="form-control select-active" name="district_id" id="district_id" required>
-                                            <option selected=""  value="">Select District</option>
-                                            @foreach(get_district_by_division_id($order->division_id) as $district)
-                                                <option value="{{ $district->id }}" {{ $district->id == $order->district_id ? 'selected': '' }}>{{ ucwords($district->district_name_en) }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <label for="upazilla_id" class="fw-bold text-black"><span class="text-danger">*</span> Upazilla</label>
-                                        <select class="form-control select-active" name="upazilla_id" id="upazilla_id" required>
-                                            <option selected=""  value="">Select Upazilla</option>
-                                            @foreach(get_upazilla_by_district_id($order->district_id) as $upazilla)
-                                                <option value="{{ $upazilla->id }}" {{ $upazilla->id == $order->upazilla_id ? 'selected': '' }}>{{ ucwords($upazilla->name_en) }}</option>
-                                            @endforeach
 
+                                    <td>
+                                        <label for="district_id" class="fw-bold text-black"><span
+                                                class="text-danger">*</span> Zone</label>
+                                    </td>
+
+                                    <td>
+                                        <select class="form-control select-active" name="district_id" id="district_id"required>
+                                            @if ($order->district_id > 0)
+                                                @foreach ($zones as $zone)
+                                                    <option value="{{ $zone->zone_id }}"
+                                                        {{ $zone->zone_id == $order->district_id ? 'selected' : '' }}>
+                                                        {{ ucwords($zone->zone_name) }}
+                                                    </option>
+                                                @endforeach
+                                            @else
+                                                <option value="">Select Zone</option>
+                                            @endif
                                         </select>
                                     </td>
                                 </tr>
+
+                                <tr>
+                                    <td>
+                                        <label for="upazilla_id" class="fw-bold text-black">Area</label>
+                                    </td>
+                                    <td>
+                                        <select class="form-control select-active" name="upazilla_id" id="upazilla_id">
+                                            @if ($order->upazilla_id > 0)
+                                                @foreach ($areasshow as $area)
+                                                    <option value="{{ $area->area_id }}"
+                                                        {{ $area->area_id == $order->upazilla_id ? 'selected' : '' }}>
+                                                        {{ ucwords($area->area_name) }}
+                                                    </option>
+                                                @endforeach
+                                            @else
+                                                <option value="">Select Area</option>
+                                            @endif
+                                        </select>
+                                    </td>
+                                    <th><span class="text-danger">*</span> Address</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="address"
+                                            value="{{ $order->address ?? 'Null' }}">
+                                    </td>
+                                </tr>
+
                                 <tr>
                                     <th>Payment Method</th>
                                     <td>
@@ -206,14 +277,8 @@
                                 <tr>
                                     <th>Sub Total</th>
                                     <td>{{ $order->sub_total }} <strong>Tk</strong></td>
-
                                     <th>Total</th>
                                     <td>{{ $order->grand_total }} <strong>Tk</strong></td>
-                                   <!--  <td>
-
-                                        <span class="badge badge-success">Delivered</span>
-
-                                    </td> -->
                                 </tr>
                             </tbody>
                     </table>
@@ -448,59 +513,68 @@
 
 <!--  Division To District Show Ajax -->
 <script type="text/javascript">
-  $(document).ready(function() {
-    $('select[name="division_id"]').on('change', function(){
+    $(document).on('change', "#division_id", function() {
         var division_id = $(this).val();
-        // const divArray = division.split("-");
-        // var division_id = divArray[0];
-        // $('#division_name').val(divArray[1]);
-        if(division_id) {
+        if (division_id) {
+            $('select[name="district_id"]').prop("disabled", true);
             $.ajax({
-                url: "{{  url('/division-district/ajax') }}/"+division_id,
-                type:"GET",
-                dataType:"json",
-                success:function(data) {
-                    $('select[name="district_id"]').html('<option value="" selected="" disabled="">Select District</option>');
-                      $.each(data, function(key, value){
-                        // console.log(value);
-                          $('select[name="district_id"]').append('<option value="'+ value.id +'">' + capitalizeFirstLetter(value.district_name_en) + '</option>');
+                url: "{{ url('/get-zones/ajax') }}/" + division_id,
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    $('select[name="district_id"]').html(
+                        '<option value="" selected disabled>Select Zone</option>'
+                    );
+                    $.each(data, function(key, value) {
+                        $('select[name="district_id"]').append(
+                            '<option value="' + value.zone_id + '">' +
+                            capitalizeFirstLetter(value.zone_name) +
+                            '</option>');
                     });
-                    $('select[name="upazilla_id"]').html('<option value="" selected="" disabled="">Select District</option>');
-                },
-            });
-        } else {
-           alert('danger');
-        }
-    });
-    function capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-});
-</script>
-
-<!--  District To Upazilla Show Ajax -->
-<script type="text/javascript">
-  $(document).ready(function() {
-    $('select[name="district_id"]').on('change', function(){
-        var district_id = $(this).val();
-        if(district_id) {
-            $.ajax({
-                url: "{{  url('/district-upazilla/ajax') }}/"+district_id,
-                type:"GET",
-                dataType:"json",
-                success:function(data) {
-                   var d =$('select[name="upazilla_id"]').empty();
-                      $.each(data, function(key, value){
-                          $('select[name="upazilla_id"]').append('<option value="'+ value.id +'">' + value.name_en + '</option>');
-                          $('select[name="upazilla_id"]').append('<option  class="d-none" value="'+ value.id +'">' + value.name_en + '</option>');
-                      });
+                    $('select[name="district_id"]').prop("disabled", false);
                 },
             });
         } else {
             alert('danger');
         }
     });
-});
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+</script>
+
+<!--  District To Upazilla Show Ajax -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('select[name="district_id"]').on('change', function() {
+            var district_id = $(this).val();
+            if (district_id) {
+                $('select[name="upazilla_id"]').prop("disabled", true);
+                $.ajax({
+                    url: "{{ url('/get-areas/ajax') }}/" + district_id,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        var d = $('select[name="upazilla_id"]').empty();
+                        $.each(data, function(key, value) {
+                            $('select[name="upazilla_id"]').append(
+                                '<option value="' + value.area_id + '">' +
+                                capitalizeFirstLetter(value.area_name) +
+                                '</option>');
+                        });
+                        $('select[name="upazilla_id"]').prop("disabled", false);
+                    },
+                });
+            } else {
+                alert('danger');
+            }
+        });
+    });
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 </script>
 
 <!-- Customer Edit Modal -->
@@ -527,10 +601,6 @@
                         <label for="division_id" class="fw-bold text-black col-form-label"><span class="text-danger">*</span> Phone</label>
                         <input type="number" class="form-control" name="phone" placeholder="Enter the phone" value="{{ $order->phone ?? 'Null'}}">
                     </div>
-                    <!-- <div class="form-group col-lg-6">
-                        <label for="division_id" class="fw-bold text-black col-form-label"><span class="text-danger">*</span> Password</label>
-                        <input type="password" class="form-control">
-                    </div> -->
                 </div>
             </div>
             <div class="modal-footer">

@@ -324,4 +324,36 @@ class OrderController extends Controller
         return view('backend.invoices.invoice_print', compact('order'));
     } // end method
 
+
+    public function order_product_packaged(Request $request)
+    {
+        $ids = $request->ids;
+        $orders = Order::whereIn('id', $ids)->get();
+        $status = 'shipped';
+        $sendPathao = 1;
+        Order::whereIn('id', $ids)->update(['delivery_status' => $status, 'send_pathao' => $sendPathao]);
+        $requests = [];
+        foreach ($orders as $order) {
+            $item['merchant_order_id'] = $order->invoice_no;
+            $item['recipient_name'] = $order->name;
+            $item['recipient_phone'] = $order->phone;
+            $item['recipient_address'] = $order->address;
+            $item['recipient_city'] = $order->division_id;
+            $item['recipient_zone'] = $order->district_id;
+            $item['recipient_area'] = $order->upazilla_id;
+            $item['item_quantity'] = $order->total_items;
+            $item['item_weight'] = 0.5;
+            $item['amount_to_collect'] = $order->grand_total;
+
+            array_push($requests, $item);
+        }
+        $data['orders'] = $requests;
+        $pathao = new PathaoController();
+        $resultData = $pathao->init($data);
+        return response()->json([
+            'status' => 'success',
+            'message' => "Products are Shipped",
+            'resultData' => $resultData,
+        ]);
+    }
 }

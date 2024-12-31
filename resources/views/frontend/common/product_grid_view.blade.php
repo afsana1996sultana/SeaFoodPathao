@@ -89,6 +89,10 @@
                          <span class="price">৳{{ $product->regular_price }}</span>
                      </div>
                  @endif
+                @php
+                    $productsellcount = \App\Models\OrderDetail::where('product_id', $product->id)->sum('qty') ?? 0;
+                @endphp
+                <span class="price">Sold({{ $productsellcount }})</span>
                  {{--  <div class="add-cart">
                      @if ($product->is_varient == 1)
                          <a class="add" id="{{ $product->id }}" onclick="productView(this.id)"

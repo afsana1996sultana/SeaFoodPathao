@@ -123,7 +123,7 @@
 <script type="text/javascript">
     var orderData = @json($orderData);
 
-    var labels = orderData.map(data => data.upazilla_name);
+    var labels = orderData.map(data => data.area_name);
     var orderCounts = orderData.map(data => data.order_count);
 
     var data = {

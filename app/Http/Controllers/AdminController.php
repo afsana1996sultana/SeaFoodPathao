@@ -16,6 +16,7 @@ use Session;
 use Artisan;
 use Cache;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Frontend\PathaoController;
 
 class AdminController extends Controller
 {
@@ -98,12 +99,36 @@ class AdminController extends Controller
                 ->first();
         }
 
-        // Fetching order counts by upazilla
-        $orderData = DB::table('orders')
-            ->join('upazillas', 'orders.upazilla_id', '=', 'upazillas.id')
-            ->select('upazillas.name_en as upazilla_name', DB::raw('count(orders.id) as order_count'))
-            ->groupBy('upazillas.name_en')
-            ->get();
+        $orders = Order::get();
+        $pathao = new PathaoController;
+        $orderData = [];
+
+        foreach ($orders as $order) {
+            $areasshow = [];
+
+            if ($order->district_id > 0) {
+                $areaResult = $pathao->getAreas($order->district_id);
+                $areasshow = $areaResult->data->data ?? [];
+            }
+
+            // Match area_id with upazilla_id and fetch area_name
+            $matchingArea = collect($areasshow)->firstWhere('area_id', $order->upazilla_id);
+            if ($matchingArea) {
+                // Check if the area already exists in the orderData array
+                $existingIndex = array_search($matchingArea->area_name, array_column($orderData, 'area_name'));
+
+                if ($existingIndex !== false) {
+                    // Increment order count if the area already exists
+                    $orderData[$existingIndex]['order_count'] += 1;
+                } else {
+                    // Add new area with initial order count
+                    $orderData[] = [
+                        'area_name' => $matchingArea->area_name,
+                        'order_count' => 1,
+                    ];
+                }
+            }
+        }
 
         return view('admin.index', compact(
             'userCount', 'productCount', 'categoryCount',
@@ -111,9 +136,20 @@ class AdminController extends Controller
             'lowStockCount', 'orderData'
         ));
     }
-     // end method
-
     /*=================== End Dashboard Methoed ===================*/
+
+    // private function getLocationDetail($locationData, $id, $key)
+    // {
+    //     $locations = $locationData->data->data ?? [];
+
+    //     foreach ($locations as $location) {
+    //         if ($location->{$key} == $id) {
+    //             return $location;
+    //         }
+    //     }
+
+    //     return null;
+    // }
 
     /*=================== Start Admin Login Methoed ===================*/
     public function Login(Request $request){

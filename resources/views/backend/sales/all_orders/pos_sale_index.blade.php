@@ -125,16 +125,53 @@
                                         <td>{{ $order->note_status }}</td>
                                         <td>{{ $order->created_at ? $order->created_at->format('Y-m-d g:i:s A') : '' }}</td>
                                         <td>{{ $order->staff->user->name ?? 'Admin' }}</td>
-                                        <td class="text-end">
-                                            <a  class="btn btn-primary btn-icon btn-circle btn-sm btn-xs" href="{{route('all_orders.show',$order->id) }}">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </a>
-                                            <a class="btn btn-primary btn-icon btn-circle btn-sm btn-xs" href="{{ route('invoice.download', $order->id) }}">
-                                                <i class="fa-solid fa-download"></i>
-                                            </a>
-                                            <a href="{{ route('delete.orders',$order->id) }}" id="delete" class="btn btn-primary btn-icon btn-circle btn-sm btn-xs" data-href="#" >
-                                                <i class="fa-solid fa-trash"></i>
-                                            </a>
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <a type="button" class="btn btn-block" id="dropdownMenuButton" data-bs-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fa fa-ellipsis-v"></i>
+                                                </a>
+                                                <ul class="dropdown-menu order__action" aria-labelledby="dropdownMenuButton">
+                                                    @if($order->send_pathao == 0)
+                                                        <li>
+                                                            <a class="dropdown-item" id="send_courier_and_print" 
+                                                            data-order-id="{{ $order->id }}" 
+                                                            data-invoice-url="{{ route('print.invoice.download', $order->id) }}">
+                                                                <i class="fa-solid fa-print" style="color:#3BB77E"></i>Invoice Pathao
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                    <li>
+                                                        <a class="dropdown-item" target="blank"
+                                                            href="{{ route('print.invoice.download', $order->id) }}"><i
+                                                                class="fa-solid fa-print" style="color:#3BB77E"></i>Invoice Print</a>
+                                                    </li>
+                                                    @if (Auth::guard('admin')->user()->role == '1' ||
+                                                            in_array('18', json_decode(Auth::guard('admin')->user()->staff->role->permissions)))
+                                                        <li>
+                                                            <a target="_blank" class="dropdown-item"
+                                                                href="{{ route('all_orders.show', $order->id) }}">
+                                                                <i class="fa-solid fa-eye" style="color:#3BB77E"></i>Details
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                    <li>
+                                                        <a title="Download" href="{{ route('invoice.download', $order->id) }}"
+                                                            class="dropdown-item">
+                                                            <i class="fa-solid fa-download" style="color:#3BB77E"></i> Invoice Download
+                                                        </a>
+                                                    </li>
+                                                    @if (Auth::guard('admin')->user()->role == '1' ||
+                                                            in_array('20', json_decode(Auth::guard('admin')->user()->staff->role->permissions)))
+                                                        <li>
+                                                            <a title="Delete" style="color:#ff0000" href="{{ route('delete.orders',$order->id) }}" class="dropdown-item "
+                                                                id="delete">
+                                                                <i class="fa-solid fa-trash" style="color:#ff0000"></i> Delete
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -167,6 +204,49 @@
             locale: {
                 format: 'YYYY-MM-DD h:mm A'
             }
+        });
+    });
+</script>
+<script>
+    $(function () {
+        $("#send_courier_and_print").click(function (e) {
+            e.preventDefault();
+
+            // Get the single order ID from a data attribute
+            var orderId = $(this).data('order-id');
+            var invoiceUrl = $(this).data('invoice-url');
+
+            if (!orderId) {
+                toastr.error('Order ID is missing.', 'Error');
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('order.product.packaged') }}",
+                type: "GET",
+                data: {
+                    ids: [orderId], // Pass the single order ID as an array
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        toastr.success(response.message, 'Success');
+
+                        // Open the invoice URL in a new tab
+                        window.open(invoiceUrl, '_blank');
+
+                        // Reload the page after a slight delay for user feedback
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000); // Adjust delay time if needed
+                    } else {
+                        toastr.error(response.error, 'Error');
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error('An error occurred while processing the request.', 'Error');
+                }
+            });
         });
     });
 </script>

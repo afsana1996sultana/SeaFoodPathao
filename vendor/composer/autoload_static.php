@@ -21,13 +21,13 @@ class ComposerStaticInit310caa99f97f1df2426af73345fc2142
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '9cdd7b9056abc3081735233ba9dd9c7f' => __DIR__ . '/..' . '/facade/flare-client-php/src/helpers.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '538ca81a9a966a6716601ecf48f4eaef' => __DIR__ . '/..' . '/opis/closure/functions.php',
         '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         'ed962a97bd972bc82007176b647d4e36' => __DIR__ . '/..' . '/facade/ignition/src/helpers.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '265b4faa2b3a9766332744949e83bf97' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Collections/helpers.php',
         'c7a3c339e7e14b60e06a2d7fcce9476b' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Events/functions.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
@@ -174,6 +174,7 @@ class ComposerStaticInit310caa99f97f1df2426af73345fc2142
         'C' => 
         array (
             'Cron\\' => 5,
+            'Codeboxr\\PathaoCourier\\' => 23,
             'Carbon\\Doctrine\\' => 16,
             'Carbon\\' => 7,
         ),
@@ -344,8 +345,8 @@ class ComposerStaticInit310caa99f97f1df2426af73345fc2142
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -528,6 +529,10 @@ class ComposerStaticInit310caa99f97f1df2426af73345fc2142
         array (
             0 => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron',
         ),
+        'Codeboxr\\PathaoCourier\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/codeboxr/pathao-courier/src',
+        ),
         'Carbon\\Doctrine\\' => 
         array (
             0 => __DIR__ . '/..' . '/carbonphp/carbon-doctrine-types/src/Carbon/Doctrine',
@@ -652,6 +657,7 @@ class ComposerStaticInit310caa99f97f1df2426af73345fc2142
         'App\\Models\\Ordernote' => __DIR__ . '/../..' . '/app/Models/Ordernote.php',
         'App\\Models\\Page' => __DIR__ . '/../..' . '/app/Models/Page.php',
         'App\\Models\\PaymentMethod' => __DIR__ . '/../..' . '/app/Models/PaymentMethod.php',
+        'App\\Models\\PosCart' => __DIR__ . '/../..' . '/app/Models/PosCart.php',
         'App\\Models\\Product' => __DIR__ . '/../..' . '/app/Models/Product.php',
         'App\\Models\\ProductPrice' => __DIR__ . '/../..' . '/app/Models/ProductPrice.php',
         'App\\Models\\ProductStock' => __DIR__ . '/../..' . '/app/Models/ProductStock.php',
@@ -784,6 +790,15 @@ class ComposerStaticInit310caa99f97f1df2426af73345fc2142
         'Carbon\\Translator' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Translator.php',
         'Carbon\\TranslatorImmutable' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/TranslatorImmutable.php',
         'Carbon\\TranslatorStrongTypeInterface' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/TranslatorStrongTypeInterface.php',
+        'Codeboxr\\PathaoCourier\\Apis\\AreaApi' => __DIR__ . '/..' . '/codeboxr/pathao-courier/src/Apis/AreaApi.php',
+        'Codeboxr\\PathaoCourier\\Apis\\BaseApi' => __DIR__ . '/..' . '/codeboxr/pathao-courier/src/Apis/BaseApi.php',
+        'Codeboxr\\PathaoCourier\\Apis\\OrderApi' => __DIR__ . '/..' . '/codeboxr/pathao-courier/src/Apis/OrderApi.php',
+        'Codeboxr\\PathaoCourier\\Apis\\StoreApi' => __DIR__ . '/..' . '/codeboxr/pathao-courier/src/Apis/StoreApi.php',
+        'Codeboxr\\PathaoCourier\\Exceptions\\PathaoCourierValidationException' => __DIR__ . '/..' . '/codeboxr/pathao-courier/src/Exceptions/PathaoCourierValidationException.php',
+        'Codeboxr\\PathaoCourier\\Exceptions\\PathaoException' => __DIR__ . '/..' . '/codeboxr/pathao-courier/src/Exceptions/PathaoException.php',
+        'Codeboxr\\PathaoCourier\\Facade\\PathaoCourier' => __DIR__ . '/..' . '/codeboxr/pathao-courier/src/Facade/PathaoCourier.php',
+        'Codeboxr\\PathaoCourier\\Manage\\Manage' => __DIR__ . '/..' . '/codeboxr/pathao-courier/src/Manage/Manage.php',
+        'Codeboxr\\PathaoCourier\\PathaoCourierServiceProvider' => __DIR__ . '/..' . '/codeboxr/pathao-courier/src/PathaoCourierServiceProvider.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Cron\\AbstractField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/AbstractField.php',
         'Cron\\CronExpression' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/CronExpression.php',

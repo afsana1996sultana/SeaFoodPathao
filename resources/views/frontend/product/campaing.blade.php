@@ -196,10 +196,13 @@ Category Nest Online Shop
                                                              <span class="price">৳{{ $product->regular_price }}</span>
                                                          </div>
                                                      @endif
+                                                    @php
+                                                        $productsellcount = \App\Models\OrderDetail::where('product_id', $product->id)->sum('qty') ?? 0;
+                                                    @endphp
+                                                    <span class="price">Sold({{ $productsellcount }})</span>
                                                  </div>
                                              </div>
                                          </div>
-                                        
                                     @endif
                                 @endforeach
                             </div>

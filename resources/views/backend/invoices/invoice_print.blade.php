@@ -32,7 +32,7 @@
 			padding: .25rem .7rem;
 		}
 		table.sm-padding td{
-			padding: .1rem .7rem;
+			padding: 0;
 		}
 		.border-bottom td,
 		.border-bottom th{
@@ -80,9 +80,8 @@
 
 		<div style="padding: 0px 20px;">
             <table>
-				<tr><td class="strong small gry-color">Bill to: @if($order->user->role == 4) Walk-in Customer  @else  {{ $order->user->name ?? 'Walk-in Customer' }} @endif</td></tr>
-				<!--<tr><td class="strong">{{ $order->user->name }}</td></tr>-->
-				@if($order->user->role != 4)
+				<tr><td class="strong small gry-color">Bill to: {{ $order->name }}</td></tr>
+				@if($order->phone)
 					<tr><td class="gry-color small">Phone: {{ $order->phone ?? '' }}</td></tr>
 				@endif
 				<tr>
@@ -129,34 +128,46 @@
 	        	</thead>
 		        <tbody>
 			        <tr>
-			            <td class="text-left">
-                          
-			            </td>
-			            <td>
+			            <td class="text-left"></td>
+			            <td class="text-right">
 					        <table class="text-right small strong">
-						        <tbody>
+								<tbody>
 							        <tr>
-							            <th class="gry-color text-left" style="display: flex; font-size: 13px;">Sub Total</th>
+							            <th class="gry-color text-left">Sub Total</th>
 							            <td class="currency">{{ $order->sub_total }}</td>
 							        </tr>
-									@if($order->discount>0)
+
+									@if($order->shipping_charge>0)
 										<tr>
+											<th class="gry-color text-left">Shipping Cost</th>
+											<td class="currency">{{ $order->shipping_charge }}</td>
+										</tr>
+									@endif
+
+									@if($order->discount>0)
+										<tr class="border-bottom">
 											<th class="gry-color text-left">Discount</th>
 											<td class="currency">{{ $order->discount }}</td>
 										</tr>
 									@endif
-									<tr class="">
-							            <th class="gry-color text-left">Paid</th>
-							            <td class="currency">{{ $order->paid_amount }}</td>
+
+									<tr>
+							            <th class="text-left strong">Grand Total</th>
+							            <td class="currency">{{ $order->grand_total }}</td>
 							        </tr>
-									<tr class="border-bottom">
-							            <th class="gry-color text-left">Due</th>
-							            <td class="currency">{{ $order->due_amount }}</td>
-							        </tr>
-							        <tr>
-							            <th class="text-left" style="font-weight: 600; display: flex; font-size: 12px;">Grand Total</th>
-							            <td class="currency" style="font-weight: 600;">{{ $order->grand_total }}</td>
-							        </tr>
+									@if($order->paid_amount>0)
+										<tr class="">
+											<th class="gry-color text-left">Paid</th>
+											<td class="currency">{{ $order->paid_amount }}</td>
+										</tr>
+									@endif
+
+									@if($order->due_amount>0)
+										<tr class="border-bottom">
+											<th class="gry-color text-left">Due</th>
+											<td class="currency">{{ $order->due_amount }}</td>
+										</tr>
+									@endif
 						        </tbody>
 						    </table>
 			            </td>

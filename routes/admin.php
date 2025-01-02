@@ -7,7 +7,7 @@ use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Backend\SupplierController;
 use App\Http\Controllers\Backend\SliderController;
 use App\Http\Controllers\Backend\ProductController;
-use App\Http\Controllers\Backend\TagController;
+// use App\Http\Controllers\Backend\TagController;
 use App\Http\Controllers\Backend\VendorController;
 use App\Http\Controllers\Backend\CampaingController;
 use App\Http\Controllers\Backend\BannerController;
@@ -102,17 +102,17 @@ Route::prefix('admin')->middleware('admin')->group(function(){
 	});
 
 	// Admin Tags All Routes
-	Route::prefix('tag')->group(function(){
-		Route::get('/view', [TagController::class, 'TagView'])->name('tag.all');
-		Route::get('/add', [TagController::class, 'TagAdd'])->name('tag.add');
-		Route::post('/store', [TagController::class, 'TagStore'])->name('tag.store');
-		Route::get('/edit/{id}', [TagController::class, 'TagEdit'])->name('tag.edit');
-		Route::post('/update/{id}', [TagController::class, 'TagUpdate'])->name('tag.update');
-		Route::get('/delete/{id}', [TagController::class, 'TagDelete'])->name('tag.delete');
-		Route::get('/tag_active/{id}', [TagController::class, 'active'])->name('tag.active');
-		Route::get('/tag_inactive/{id}', [TagController::class, 'inactive'])->name('tag.in_active');
+	// Route::prefix('tag')->group(function(){
+	// 	Route::get('/view', [TagController::class, 'TagView'])->name('tag.all');
+	// 	Route::get('/add', [TagController::class, 'TagAdd'])->name('tag.add');
+	// 	Route::post('/store', [TagController::class, 'TagStore'])->name('tag.store');
+	// 	Route::get('/edit/{id}', [TagController::class, 'TagEdit'])->name('tag.edit');
+	// 	Route::post('/update/{id}', [TagController::class, 'TagUpdate'])->name('tag.update');
+	// 	Route::get('/delete/{id}', [TagController::class, 'TagDelete'])->name('tag.delete');
+	// 	Route::get('/tag_active/{id}', [TagController::class, 'active'])->name('tag.active');
+	// 	Route::get('/tag_inactive/{id}', [TagController::class, 'inactive'])->name('tag.in_active');
 
-	});
+	// });
 
 	// Admin Product All Routes
 	Route::prefix('product')->group(function(){

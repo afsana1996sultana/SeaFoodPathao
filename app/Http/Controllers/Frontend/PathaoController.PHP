@@ -19,10 +19,10 @@ class PathaoController extends Controller
             $this->base_url = "https://api-hermes.pathao.com";
         }
     }
-
+    
     public function init($data){
 
-        $data['store_id'] = 29894;
+        $data['store_id'] = 215448;
         $data['sender_name'] = env('APP_NAME');
         $data['sender_phone'] = '01768305720';
         $data['delivery_type'] = 48;
@@ -31,7 +31,7 @@ class PathaoController extends Controller
 
         return $this->create($data);
     }
-
+    
 
     public function getToken(){
         $header = array(
@@ -100,7 +100,7 @@ class PathaoController extends Controller
         // dd($resultdata);
         return $data;
     }
-
+    
 
     public function create($data){
         //dd($data);
@@ -188,7 +188,7 @@ class PathaoController extends Controller
 
         return json_decode($resultdata);
     }
-
+    
 
     public function getCities()
     {
@@ -216,7 +216,7 @@ class PathaoController extends Controller
         //dd($resultdata);
         return json_decode($resultdata);
     }
-
+    
 
     public function getZones($cityId)
     {
@@ -241,11 +241,11 @@ class PathaoController extends Controller
 
         $resultdata = curl_exec($url);
         curl_close($url);
-
+        
         //dd($resultdata);
         return json_decode($resultdata);
     }
-
+    
 
     public function getAreas($zoneId)
     {
